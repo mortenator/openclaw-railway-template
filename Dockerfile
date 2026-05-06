@@ -12,6 +12,11 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
  && apt-get update && apt-get install -y gh \
  && rm -rf /var/lib/apt/lists/*
 
+# Wrap `gh` so it can recover GH_TOKEN/GITHUB_TOKEN from /proc/1/environ when
+# AlphaClaw's spawn strips them from the agent shell's env. No-op if a token
+# is already present. See scripts/gh-wrapper.
+COPY --chmod=0755 scripts/gh-wrapper /usr/local/bin/gh
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
